@@ -2,7 +2,10 @@
 """
 Common modules
 """
+
 import os
+import ast
+import contextlib
 import json
 import math
 import platform
@@ -40,7 +43,7 @@ class Conv(nn.Module):
         super().__init__()
         self.conv = nn.Conv2d(c1, c2, k, s, autopad(k, p), groups=g, bias=False)
         self.bn = nn.BatchNorm2d(c2)
-        # self.act = nn.SiLU() if act is True else (act if isinstance(act, nn.Module) else nn.Identity())
+        # self.act = self.default_act if act is True else act if isinstance(act, nn.Module) else nn.Identity()
         self.act = nn.ReLU() if act is True else (act if isinstance(act, nn.Module) else nn.Identity())
 
     def forward(self, x):
@@ -206,7 +209,7 @@ if os.getenv('RKNN_model_hack', '0') == '0':
             with warnings.catch_warnings():
                 warnings.simplefilter('ignore')  # suppress torch 1.9.0 max_pool2d() warning
                 return self.cv2(torch.cat([x] + [m(x) for m in self.m], 1))
-elif os.getenv('RKNN_model_hack', '0') in ['npu_1', 'npu_2']:
+elif os.getenv('RKNN_model_hack', '0') in ['1']:
     # TODO remove this hack when rknn-toolkit1/2 add this optimize rules
     class SPP(nn.Module):
         def __init__(self, c1, c2, k=(5, 9, 13)):
@@ -249,7 +252,7 @@ if os.getenv('RKNN_model_hack', '0') in ['0']:
                 y1 = self.m(x)
                 y2 = self.m(y1)
                 return self.cv2(torch.cat([x, y1, y2, self.m(y2)], 1))
-elif os.getenv('RKNN_model_hack', '0') in ['npu_1','npu_2']:
+elif os.getenv('RKNN_model_hack', '0') in ['1']:
     class SPPF(nn.Module):
         # Spatial Pyramid Pooling - Fast (SPPF) layer for YOLOv5 by Glenn Jocher
         def __init__(self, c1, c2, k=5):  # equivalent to SPP(k=(5, 9, 13))

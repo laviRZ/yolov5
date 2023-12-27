@@ -54,15 +54,8 @@ from pathlib import Path
 
 
 # activate rknn hack
-if len(sys.argv)>=3 and '--rknpu' in sys.argv:
-    _index = sys.argv.index('--rknpu')
-    if sys.argv[_index+1].upper() in ['RK1808', 'RV1109', 'RV1126','RK3399PRO']:
-        os.environ['RKNN_model_hack'] = 'npu_1'
-    elif sys.argv[_index+1].upper() in ['RK3566', 'RK3568', 'RK3588','RK3588S','RV1106','RV1103']:
-        os.environ['RKNN_model_hack'] = 'npu_2'
-    else:
-        assert False,"{} not recognized".format(sys.argv[_index+1])
-
+if '--rknpu' in sys.argv:
+    os.environ['RKNN_model_hack'] = "1"
 
 import pandas as pd
 import torch
@@ -77,7 +70,7 @@ if platform.system() != 'Windows':
     ROOT = Path(os.path.relpath(ROOT, Path.cwd()))  # relative
 
 from models.experimental import attempt_load
-from models.yolo import Detect
+from models.yolo import ClassificationModel, Detect, DetectionModel, SegmentationModel, Segment
 from utils.dataloaders import LoadImages
 from utils.general import (LOGGER, check_dataset, check_img_size, check_requirements, check_version, check_yaml,
                            colorstr, file_size, print_args, url2file)
@@ -526,7 +519,7 @@ def run(
             m.onnx_dynamic = dynamic
             m.export = True
 
-        if os.getenv('RKNN_model_hack', '0') in ['npu_1','npu_2']:
+        if os.getenv('RKNN_model_hack', '0') in ['1']:
             from models.common import Focus
             from models.common import Conv
             from models.common_rk_plug_in import surrogate_focus
@@ -572,23 +565,31 @@ def run(
                 model.model[0].f = temp_f
                 model.model[0].eval()
 
-    if isinstance(model.model[-1], Detect):
-        # save anchors
-        print('---> save anchors for RKNN')
-        RK_anchors = model.model[-1].stride.reshape(3,1).repeat(1,3).reshape(-1,1)* model.model[-1].anchors.reshape(9,2)
-        with open('RK_anchors.txt', 'w') as anf:
-            # anf.write(str(model.model[-1].na)+'\n')
-            for _v in RK_anchors.numpy().flatten():
-                anf.write(str(_v)+'\n')
-        RK_anchors = RK_anchors.tolist()
-        print(RK_anchors)
+    if os.getenv('RKNN_model_hack', '0') in ['1']:
+        if isinstance(model.model[-1], Detect):
+            # save anchors
+            print('---> save anchors for RKNN')
+            RK_anchors = model.model[-1].stride.reshape(3,1).repeat(1,3).reshape(-1,1)* model.model[-1].anchors.reshape(9,2)
+            with open('RK_anchors.txt', 'w') as anf:
+                # anf.write(str(model.model[-1].na)+'\n')
+                for _v in RK_anchors.numpy().flatten():
+                    anf.write(str(_v)+'\n')
+            RK_anchors = RK_anchors.tolist()
+            print(RK_anchors)
 
+        if isinstance(model.model[-1], Segment):
+            print("export segment model for RKNPU")
+            model.model[-1]._register_seg_seperate(True)
+        else:
+            print("export detect model for RKNPU")
+            model.model[-1]._register_detect_seperate(True)
 
     for _ in range(2):
         y = model(im)  # dry runs
     if half and not coreml:
         im, model = im.half(), model.half()  # to FP16
     shape = tuple((y[0] if (isinstance(y, tuple) or (isinstance(y, list))) else y).shape)  # model output shape
+    metadata = {'stride': int(max(model.stride)), 'names': model.names}  # model metadata
     LOGGER.info(f"\n{colorstr('PyTorch:')} starting from {file} with output shape {shape} ({file_size(file):.1f} MB)")
 
     # Exports
@@ -669,9 +670,9 @@ def parse_opt():
     parser.add_argument('--conf-thres', type=float, default=0.25, help='TF.js NMS: confidence threshold')
     parser.add_argument('--include',
                         nargs='+',
-                        default=['torchscript'],
+                        default=['onnx'],
                         help='torchscript, onnx, openvino, engine, coreml, saved_model, pb, tflite, edgetpu, tfjs')
-    parser.add_argument('--rknpu', default=None, help='RKNN npu platform')
+    parser.add_argument('--rknpu', action='store_true', help='RKNN npu platform')
     opt = parser.parse_args()
     print_args(vars(opt))
     return opt

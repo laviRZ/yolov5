@@ -1,5 +1,74 @@
 #### Get model optimized for RKNN
-Exports model with optimization for RKNN, please refer here [README_rkopt_manual.md](./README_rkopt_manual.md)
+Exporting detect/segment model with optimization for RKNN, please refer here [README_rkopt.md](./README_rkopt.md)
+
+导出适配 RKNPU 的检测/分割模型, 请参考 [README_rkopt.md](./README_rkopt.md) 的说明
+
+---
+<br>
+
+<div align="center">
+  <p>
+    <a align="center" href="https://ultralytics.com/yolov5" target="_blank">
+      <img width="850" src="https://raw.githubusercontent.com/ultralytics/assets/master/yolov5/v70/splash.png"></a>
+  </p>
+
+  English | [简体中文](.github/README_cn.md)
+  <br>
+  <div>
+    <a href="https://github.com/ultralytics/yolov5/actions/workflows/ci-testing.yml"><img src="https://github.com/ultralytics/yolov5/actions/workflows/ci-testing.yml/badge.svg" alt="YOLOv5 CI"></a>
+    <a href="https://zenodo.org/badge/latestdoi/264818686"><img src="https://zenodo.org/badge/264818686.svg" alt="YOLOv5 Citation"></a>
+    <a href="https://hub.docker.com/r/ultralytics/yolov5"><img src="https://img.shields.io/docker/pulls/ultralytics/yolov5?logo=docker" alt="Docker Pulls"></a>
+    <br>
+    <a href="https://bit.ly/yolov5-paperspace-notebook"><img src="https://assets.paperspace.io/img/gradient-badge.svg" alt="Run on Gradient"></a>
+    <a href="https://colab.research.google.com/github/ultralytics/yolov5/blob/master/tutorial.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"></a>
+    <a href="https://www.kaggle.com/ultralytics/yolov5"><img src="https://kaggle.com/static/images/open-in-kaggle.svg" alt="Open In Kaggle"></a>
+  </div>
+
+  <br>
+  <p>
+    YOLOv5 🚀 is the world's most loved vision AI, representing <a href="https://ultralytics.com">Ultralytics</a>
+    open-source research into future vision AI methods, incorporating lessons learned and best practices evolved over thousands of hours of research and development.
+    <br><br>
+    To request a commercial license please complete the form at <a href="https://ultralytics.com/license">Ultralytics Licensing</a>.
+    <br><br>
+  </p>
+
+  <div align="center">
+    <a href="https://github.com/ultralytics" style="text-decoration:none;">
+      <img src="https://github.com/ultralytics/assets/raw/master/social/logo-social-github.png" width="2%" alt="" /></a>
+    <img src="https://github.com/ultralytics/assets/raw/master/social/logo-transparent.png" width="2%" alt="" />
+    <a href="https://www.linkedin.com/company/ultralytics" style="text-decoration:none;">
+      <img src="https://github.com/ultralytics/assets/raw/master/social/logo-social-linkedin.png" width="2%" alt="" /></a>
+    <img src="https://github.com/ultralytics/assets/raw/master/social/logo-transparent.png" width="2%" alt="" />
+    <a href="https://twitter.com/ultralytics" style="text-decoration:none;">
+      <img src="https://github.com/ultralytics/assets/raw/master/social/logo-social-twitter.png" width="2%" alt="" /></a>
+    <img src="https://github.com/ultralytics/assets/raw/master/social/logo-transparent.png" width="2%" alt="" />
+    <a href="https://www.producthunt.com/@glenn_jocher" style="text-decoration:none;">
+      <img src="https://github.com/ultralytics/assets/raw/master/social/logo-social-producthunt.png" width="2%" alt="" /></a>
+    <img src="https://github.com/ultralytics/assets/raw/master/social/logo-transparent.png" width="2%" alt="" />
+    <a href="https://youtube.com/ultralytics" style="text-decoration:none;">
+      <img src="https://github.com/ultralytics/assets/raw/master/social/logo-social-youtube.png" width="2%" alt="" /></a>
+    <img src="https://github.com/ultralytics/assets/raw/master/social/logo-transparent.png" width="2%" alt="" />
+    <a href="https://www.facebook.com/ultralytics" style="text-decoration:none;">
+      <img src="https://github.com/ultralytics/assets/raw/master/social/logo-social-facebook.png" width="2%" alt="" /></a>
+    <img src="https://github.com/ultralytics/assets/raw/master/social/logo-transparent.png" width="2%" alt="" />
+    <a href="https://www.instagram.com/ultralytics/" style="text-decoration:none;">
+      <img src="https://github.com/ultralytics/assets/raw/master/social/logo-social-instagram.png" width="2%" alt="" /></a>
+  </div>
+</div>
+
+
+## <div align="center">Segmentation ⭐ NEW</div>
+
+<div align="center">
+<a align="center" href="https://ultralytics.com/yolov5" target="_blank">
+<img width="800" src="https://user-images.githubusercontent.com/26833433/203348073-9b85607b-03e2-48e1-a6ba-fe1c1c31749c.png"></a>
+</div>
+
+Our new YOLOv5 [release v7.0](https://github.com/ultralytics/yolov5/releases/v7.0) instance segmentation models are the fastest and most accurate in the world, beating all current [SOTA benchmarks](https://paperswithcode.com/sota/real-time-instance-segmentation-on-mscoco). We've made them super simple to train, validate and deploy. See full details in our [Release Notes](https://github.com/ultralytics/yolov5/releases/v7.0) and visit our [YOLOv5 Segmentation Colab Notebook](https://github.com/ultralytics/yolov5/blob/master/segment/tutorial.ipynb) for quickstart tutorials.
+
+<details>
+  <summary>Segmentation Checkpoints</summary>
 
 ---
 <br>
