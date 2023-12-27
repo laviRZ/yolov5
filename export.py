@@ -42,6 +42,12 @@ TensorFlow.js:
     $ npm start
 """
 
+from utils.torch_utils import select_device, smart_inference_mode
+from utils.general import (LOGGER, check_dataset, check_img_size, check_requirements, check_version, check_yaml,
+                           colorstr, file_size, print_args, url2file)
+from utils.dataloaders import LoadImages
+from models.yolo import Detect, Segment
+from models.experimental import attempt_load
 import argparse
 import json
 import os
@@ -68,13 +74,6 @@ if str(ROOT) not in sys.path:
     sys.path.append(str(ROOT))  # add ROOT to PATH
 if platform.system() != 'Windows':
     ROOT = Path(os.path.relpath(ROOT, Path.cwd()))  # relative
-
-from models.experimental import attempt_load
-from models.yolo import ClassificationModel, Detect, DetectionModel, SegmentationModel, Segment
-from utils.dataloaders import LoadImages
-from utils.general import (LOGGER, check_dataset, check_img_size, check_requirements, check_version, check_yaml,
-                           colorstr, file_size, print_args, url2file)
-from utils.torch_utils import select_device, smart_inference_mode
 
 
 def export_formats():
@@ -525,13 +524,13 @@ def run(
             from models.common_rk_plug_in import surrogate_focus
             if isinstance(model.model[0], Focus):
                 # For yolo v5 version
-                surrogate_focous = surrogate_focus(int(model.model[0].conv.conv.weight.shape[1]/4),
-                                                model.model[0].conv.conv.weight.shape[0],
-                                                k=tuple(model.model[0].conv.conv.weight.shape[2:4]),
-                                                s=model.model[0].conv.conv.stride,
-                                                p=model.model[0].conv.conv.padding,
-                                                g=model.model[0].conv.conv.groups,
-                                                act=True)
+                surrogate_focous = surrogate_focus(int(model.model[0].conv.conv.weight.shape[1] / 4),
+                                                   model.model[0].conv.conv.weight.shape[0],
+                                                   k=tuple(model.model[0].conv.conv.weight.shape[2:4]),
+                                                   s=model.model[0].conv.conv.stride,
+                                                   p=model.model[0].conv.conv.padding,
+                                                   g=model.model[0].conv.conv.groups,
+                                                   act=True)
                 surrogate_focous.conv.conv.weight = model.model[0].conv.conv.weight
                 surrogate_focous.conv.conv.bias = model.model[0].conv.conv.bias
                 surrogate_focous.conv.act = model.model[0].conv.act
@@ -545,16 +544,16 @@ def run(
             elif isinstance(model.model[0], Conv) and model.model[0].conv.kernel_size == (6, 6):
                 # For yolo v6 version
                 surrogate_focous = surrogate_focus(model.model[0].conv.weight.shape[1],
-                                                model.model[0].conv.weight.shape[0],
-                                                k=(3,3), # 6/2, 6/2
-                                                s=1,
-                                                p=(1,1), # 2/2, 2/2
-                                                g=model.model[0].conv.groups,
-                                                act=hasattr(model.model[0], 'act'))
-                surrogate_focous.conv.conv.weight[:,:3,:,:] = model.model[0].conv.weight[:,:,::2,::2]
-                surrogate_focous.conv.conv.weight[:,3:6,:,:] = model.model[0].conv.weight[:,:,1::2,::2]
-                surrogate_focous.conv.conv.weight[:,6:9,:,:] = model.model[0].conv.weight[:,:,::2,1::2]
-                surrogate_focous.conv.conv.weight[:,9:,:,:] = model.model[0].conv.weight[:,:,1::2,1::2]
+                                                   model.model[0].conv.weight.shape[0],
+                                                   k=(3, 3),  # 6/2, 6/2
+                                                   s=1,
+                                                   p=(1, 1),  # 2/2, 2/2
+                                                   g=model.model[0].conv.groups,
+                                                   act=hasattr(model.model[0], 'act'))
+                surrogate_focous.conv.conv.weight[:, :3, :, :] = model.model[0].conv.weight[:, :, ::2, ::2]
+                surrogate_focous.conv.conv.weight[:, 3:6, :, :] = model.model[0].conv.weight[:, :, 1::2, ::2]
+                surrogate_focous.conv.conv.weight[:, 6:9, :, :] = model.model[0].conv.weight[:, :, ::2, 1::2]
+                surrogate_focous.conv.conv.weight[:, 9:, :, :] = model.model[0].conv.weight[:, :, 1::2, 1::2]
                 surrogate_focous.conv.conv.bias = model.model[0].conv.bias
                 surrogate_focous.conv.act = model.model[0].act
                 temp_i = model.model[0].i
@@ -569,11 +568,12 @@ def run(
         if isinstance(model.model[-1], Detect):
             # save anchors
             print('---> save anchors for RKNN')
-            RK_anchors = model.model[-1].stride.reshape(3,1).repeat(1,3).reshape(-1,1)* model.model[-1].anchors.reshape(9,2)
+            RK_anchors = model.model[-1].stride.reshape(3, 1).repeat(1,
+                                                                     3).reshape(-1, 1) * model.model[-1].anchors.reshape(9, 2)
             with open('RK_anchors.txt', 'w') as anf:
                 # anf.write(str(model.model[-1].na)+'\n')
                 for _v in RK_anchors.numpy().flatten():
-                    anf.write(str(_v)+'\n')
+                    anf.write(str(_v) + '\n')
             RK_anchors = RK_anchors.tolist()
             print(RK_anchors)
 
